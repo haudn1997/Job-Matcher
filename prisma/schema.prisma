@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum JobStatus {
+  NEW
+  BOOKMARKED
+  APPLIED
+  PHONE_SCREEN
+  INTERVIEW
+  OFFER
+  REJECTED
+  IGNORED
+}
+
+model UserSkill {
+  id        String     @id @default(cuid())
+  name      String
+  level     SkillLevel @default(INTERMEDIATE)
+  yearsExp  Float?
+  category  String     // backend | frontend | database | devops | tools | soft
+  source    String     @default("cv") // cv | manual
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([name])
+}
+
+model UserProfile {
+  id               String   @id @default("singleton")
+  name             String?
+  currentTitle     String?
+  yearsExperience  Float?
+  desiredTitles    String[]
+  desiredLocations String[]
+  salaryMin        Int?
+  salaryMax        Int?
+  currency         String   @default("VND")
+  cvText           String?  @db.Text
+  cvUpdatedAt      DateTime?
+  updatedAt        DateTime @updatedAt
+}
+
+model Job {
+  id             String    @id @default(cuid())
+  title          String
+  company        String
+  companyLogo    String?
+  location       String?
+  isRemote       Boolean   @default(false)
+  salaryMin      Int?
+  salaryMax      Int?
+  currency       String    @default("VND")
+  jobType        String?   // full-time | part-time | contract | freelance
+  seniority      String?   // junior | mid | senior | lead
+  description    String    @db.Text
+  url            String    @unique
+  source         String    // topcv | itviec | manual
+  externalId     String?
+  requiredSkills String[]
+  niceToHave     String[]
+  postedAt       DateTime?
+  expiresAt      DateTime?
+  scrapedAt      DateTime  @default(now())
+
+  match JobMatch?
+
+  @@index([source])
+  @@index([scrapedAt])
+}
+
+model JobMatch {
+  id               String    @id @default(cuid())
+  jobId            String    @unique
+  job              Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  matchScore       Float
+  matchedSkills    String[]
+  missingSkills    String[]
+  bonusSkills      String[]
+  aiSummary        String?   @db.Text
+  shouldApply      Boolean?
+  status           JobStatus @default(NEW)
+  notes            String?   @db.Text
+  appliedAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model ScrapeLog {
+  id        String   @id @default(cuid())
+  source    String
+  status    String   // success | failed | partial
+  jobsFound Int      @default(0)
+  jobsNew   Int      @default(0)
+  error     String?
+  duration  Int?
+  createdAt DateTime @default(now())
+}
