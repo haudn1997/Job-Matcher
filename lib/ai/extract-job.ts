@@ -1,6 +1,6 @@
 import { geminiFlash, generateJSON } from "./gemini";
 
-interface ExtractedJob {
+export interface ExtractedJob {
   title: string;
   company: string;
   location: string | null;

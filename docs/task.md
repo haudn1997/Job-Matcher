@@ -36,3 +36,26 @@
 - [x] Stats cards (total, avg score, applied)
 - [x] Recent high-match jobs
 - [x] Skill gap chart
+
+# Phase 2 Tasks — Auto Scraping
+
+## Step 7: Scraper Infrastructure
+- [x] So sánh & chọn công cụ (Chốt: Playwright vượt qua Cloudflare)
+- [x] Thiết lập Base Scraper Interface kết nối với Database
+- [x] Xử lý chống trùng lặp Job (bằng URL hoặc External ID)
+
+## Step 8: ITviec Scraper
+- [x] Phân tích cấu trúc DOM / API ngầm của trang tìm kiếm ITviec
+- [x] Viết hàm extract danh sách Job (Title, Company, Salary, Location, URL)
+- [x] Viết hàm extract chi tiết Job (Description, Requirements)
+
+## Step 9: TopCV Scraper
+- [x] Phân tích điểm cuối tìm kiếm API / HTML của TopCV
+- [x] Viết hàm extract danh sách Job từ TopCV
+- [x] Trích xuất chi tiết JD để đưa qua Gemini phân tích
+
+## Step 10: Auto Matching & Cron Job
+- [x] Code endpoint `/api/cron/scrape` chạy cả 2 scraper
+- [x] Liên kết list job mới crawl với hàm AI Matching `extractJob` và `matchSkills`
+- [x] Cấu hình `vercel.json` để chạy Cron mỗi ngày
+
