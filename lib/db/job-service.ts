@@ -1,6 +1,7 @@
 import { prisma } from "./prisma";
 import { ExtractedJob } from "../ai/extract-job";
 import { matchJobWithSkills } from "../ai/match-skills";
+import { sendJobAlert } from "../notifications/telegram";
 
 export async function upsertJobAndMatch(
     extracted: ExtractedJob,
@@ -60,11 +61,16 @@ export async function upsertJobAndMatch(
             extracted.title
         );
 
-        await prisma.jobMatch.upsert({
+        const savedMatch = await prisma.jobMatch.upsert({
             where: { jobId: job.id },
             update: matchResult,
             create: { jobId: job.id, ...matchResult },
         });
+
+        // Send Telegram alert for high-match new jobs (score >= 75)
+        if (matchResult.matchScore >= 50) {
+            sendJobAlert({ ...job, match: savedMatch }).catch(() => { });
+        }
     }
 
     const jobWithMatch = await prisma.job.findUnique({
